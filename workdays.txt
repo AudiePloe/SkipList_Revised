@@ -1,0 +1,5 @@
+Monday-Wednesday
+Tuesday-Thursday
+Wednesday-Friday
+Monday-Thursday
+Tuesday-Friday
