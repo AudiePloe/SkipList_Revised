@@ -84,7 +84,6 @@ public class DataManager {
     long countLines(String fileName) // counts the number of lines in the file (used for reading from file) derived
     // from Mkyong.com source
     {
-
         long lines = 0;
 
         try (InputStream is = new BufferedInputStream(new FileInputStream(fileName)))
@@ -167,7 +166,8 @@ public class DataManager {
         database.close();
     }
 
-    public void findAndPrintUsersByJobs(String job1, String job2) {
+    public void findAndPrintUsersByJobs(String job1, String job2)
+    {
         // 1. Create a temporary wrapper object for the initial search.
         UserJobWrapper searchWrapper = new UserJobWrapper(job1, new User());
 
@@ -175,15 +175,19 @@ public class DataManager {
         Node<UserJobWrapper> foundNode = jobList.logSearch(searchWrapper);
 
         // 3. Handle the case where no users are found with the first job.
-        if (foundNode == null) {
+        if (foundNode == null)
+        {
             System.out.println("No users found with the job: " + job1);
             return;
         }
 
         System.out.println("Users with jobs '" + job1 + "'");
-        if (job2 != null) {
+        if (job2 != null)
+        {
             System.out.println(" and '" + job2 + "':");
-        } else {
+        }
+        else
+        {
             System.out.println(":");
         }
 
@@ -192,7 +196,8 @@ public class DataManager {
 
         int foundUsers = 0;
         // 5. Iterate through the base level of the skip list.
-        while (current != null && current.data.jobName.equalsIgnoreCase(job1)) {
+        while (current != null && current.data.jobName.equalsIgnoreCase(job1))
+        {
             // Access the original User object.
             User user = current.data.user;
 
@@ -202,7 +207,8 @@ public class DataManager {
                     (user.job1.equalsIgnoreCase(job2) && user.job2.equalsIgnoreCase(job1)));
 
             // Print the user's data if they have both jobs (or just job1 if job2 is null).
-            if (matchesSecondJob) {
+            if (matchesSecondJob)
+            {
                 System.out.println("SSN: " + user.SSN);
                 System.out.println("Name: " + user.FirstName + " " + user.LastName);
                 System.out.println("Job 1: " + user.job1 + " " + user.workDay1 + " " + user.floor1);
@@ -210,12 +216,122 @@ public class DataManager {
                 System.out.println("---------------------------------------------------------------");
                 foundUsers++;
             }
-
             // Move to the next node in the list.
             current = current.forward[0];
-
         }
         System.out.println("\nNumber of matching users found: " + foundUsers);
     }
 
+
+    public void findAndPrintUsersByWorkday(String workDay1, String workDay2)
+    {
+        // 1. Create a temporary wrapper object for the initial search.
+        UserWorkdayWrapper searchWrapper = new UserWorkdayWrapper(workDay1, new User());
+
+        // 2. Perform a log search to find the first occurrence of job1.
+        Node<UserWorkdayWrapper> foundNode = workdayList.logSearch(searchWrapper);
+
+        // 3. Handle the case where no users are found with the first job.
+        if (foundNode == null)
+        {
+            System.out.println("No users found with the Work days: " + workDay1);
+            return;
+        }
+
+        System.out.println("Users with Work days '" + workDay1 + "'");
+        if (workDay2 != null)
+        {
+            System.out.println(" and '" + workDay2 + "':");
+        }
+        else
+        {
+            System.out.println(":");
+        }
+
+        // 4. Start a linear scan from the first found node.
+        Node<UserWorkdayWrapper> current = foundNode;
+
+        int foundUsers = 0;
+        // 5. Iterate through the base level of the skip list.
+        while (current != null && current.data.workDayName.equalsIgnoreCase(workDay1))
+        {
+            // Access the original User object.
+            User user = current.data.user;
+
+            // Check if the user has a job that matches the second input (if it's not null).
+            // The check must be against both job1 and job2 on the user object because a user has both.
+            boolean matchesSecondJob = (workDay2 == null || (user.workDay1.equalsIgnoreCase(workDay1) && user.workDay2.equalsIgnoreCase(workDay2)) ||
+                    (user.workDay1.equalsIgnoreCase(workDay2) && user.workDay2.equalsIgnoreCase(workDay1)));
+
+            // Print the user's data if they have both jobs (or just job1 if job2 is null).
+            if (matchesSecondJob)
+            {
+                System.out.println("SSN: " + user.SSN);
+                System.out.println("Name: " + user.FirstName + " " + user.LastName);
+                System.out.println("Job 1: " + user.job1 + " " + user.workDay1 + " " + user.floor1);
+                System.out.println("Job 2: " + user.job2 + " " + user.workDay2 + " " + user.floor2);
+                System.out.println("---------------------------------------------------------------");
+                foundUsers++;
+            }
+            // Move to the next node in the list.
+            current = current.forward[0];
+        }
+        System.out.println("\nNumber of matching users found: " + foundUsers);
+    }
+
+    public void findAndPrintUsersByFloor(String floor1, String floor2)
+    {
+        // 1. Create a temporary wrapper object for the initial search.
+        UserFloorWrapper searchWrapper = new UserFloorWrapper(floor1, new User());
+
+        // 2. Perform a log search to find the first occurrence of job1.
+        Node<UserFloorWrapper> foundNode = floorList.logSearch(searchWrapper);
+
+        // 3. Handle the case where no users are found with the first job.
+        if (foundNode == null)
+        {
+            System.out.println("No users found working on floor: " + floor1);
+            return;
+        }
+
+        System.out.println("Users working on floor '" + floor1 + "'");
+        if (floor2 != null)
+        {
+            System.out.println(" and '" + floor2 + "':");
+        }
+        else
+        {
+            System.out.println(":");
+        }
+
+        // 4. Start a linear scan from the first found node.
+        Node<UserFloorWrapper> current = foundNode;
+
+        int foundUsers = 0;
+        // 5. Iterate through the base level of the skip list.
+        while (current != null && current.data.floorNumber.equalsIgnoreCase(floor1))
+        {
+            // Access the original User object.
+            User user = current.data.user;
+
+            // Check if the user has a job that matches the second input (if it's not null).
+            // The check must be against both job1 and job2 on the user object because a user has both.
+            boolean matchesSecondJob = (floor2 == null || (user.floor1.equalsIgnoreCase(floor1) && user.floor2.equalsIgnoreCase(floor2)) ||
+                    (user.floor1.equalsIgnoreCase(floor2) && user.floor2.equalsIgnoreCase(floor1)));
+
+            // Print the user's data if they have both jobs (or just job1 if job2 is null).
+            if (matchesSecondJob)
+            {
+                System.out.println("SSN: " + user.SSN);
+                System.out.println("Name: " + user.FirstName + " " + user.LastName);
+                System.out.println("Job 1: " + user.job1 + " " + user.workDay1 + " " + user.floor1);
+                System.out.println("Job 2: " + user.job2 + " " + user.workDay2 + " " + user.floor2);
+                System.out.println("---------------------------------------------------------------");
+                foundUsers++;
+            }
+            // Move to the next node in the list.
+            current = current.forward[0];
+        }
+        System.out.println("\nNumber of matching users found: " + foundUsers);
+    }
 }

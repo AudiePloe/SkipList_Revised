@@ -1,5 +1,10 @@
+Monday-Tuesday
 Monday-Wednesday
-Tuesday-Thursday
-Wednesday-Friday
 Monday-Thursday
+Monday-Friday
+Tuesday-Wednesday
+Tuesday-Thursday
 Tuesday-Friday
+Wednesday-Thursday
+Wednesday-Friday
+Thursday-Friday

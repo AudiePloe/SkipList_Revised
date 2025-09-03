@@ -11,7 +11,6 @@ public class SearchList
 {
     public static DataManager dataManager = new DataManager();
 
-
     public static void main(String[] a) throws IOException
     {
 
@@ -41,7 +40,13 @@ public class SearchList
 
         do // loops asking the user what they want to do
         {
-            System.out.println("\nWelcome to the user database. To look up a user type 1. To list all users by job type 2. To exit type 3.");
+
+            System.out.println("\nWelcome to the user database.");
+            System.out.println("1) Look up a user");
+            System.out.println("2) List all users by job");
+            System.out.println("3) List all users by workDays");
+            System.out.println("4) List all users by floor");
+            System.out.println("5) To exit");
 
             num = reader.nextInt();
             reader.nextLine();
@@ -72,12 +77,10 @@ public class SearchList
                     System.out.println("User with SSN " + searchWrapper.user.SSN + " not found.");
                 }
             }
-
-
             else if (num == 2) // or if list all users by job type:
             {
                 System.out.println("\nSelect your first job:");
-                String job1 = getJobSelection(reader); // getJobSelection and availableJobs must be accessible
+                String job1 = getSelection(reader, DataManager.jobs); // getJobSelection and availableJobs must be accessible
 
                 if (job1 != null) {
                     System.out.print("\nDo you want to add a second job to the search? (y/n): ");
@@ -86,7 +89,7 @@ public class SearchList
 
                     if (secondJobChoice.equals("y")) {
                         System.out.println("\nSelect your second job:");
-                        job2 = getJobSelection(reader);
+                        job2 = getSelection(reader, DataManager.jobs);
                     }
 
                     // Call the search method with the collected jobs
@@ -95,21 +98,64 @@ public class SearchList
                     System.out.println("Search cancelled.");
                 }
             }
+            else if(num == 3)
+            {
+                System.out.println("\nSelect your first workdays:");
+                String workDay1 = getSelection(reader, DataManager.workdays); // getJobSelection and availableJobs must be accessible
+
+                if (workDay1 != null) {
+                    System.out.print("\nDo you want to add a second workdays to the search? (y/n): ");
+                    String secondDayChoice = reader.nextLine().trim().toLowerCase();
+                    String workDay2 = null;
+
+                    if (secondDayChoice.equals("y")) {
+                        System.out.println("\nSelect your second workdays:");
+                        workDay2 = getSelection(reader, DataManager.workdays);
+                    }
+
+                    // Call the search method with the collected jobs
+                    dataManager.findAndPrintUsersByWorkday(workDay1, workDay2);
+                } else {
+                    System.out.println("Search cancelled.");
+                }
+
+            }
+            else if (num == 4)
+            {
+                System.out.println("\nSelect your first floor:");
+                String floor1 = getSelection(reader, DataManager.floors); // getJobSelection and availableJobs must be accessible
+
+                if (floor1 != null) {
+                    System.out.print("\nDo you want to add a second floor to the search? (y/n): ");
+                    String secondFloorChoice = reader.nextLine().trim().toLowerCase();
+                    String floor2 = null;
+
+                    if (secondFloorChoice.equals("y")) {
+                        System.out.println("\nSelect your second floor:");
+                        floor2 = getSelection(reader, DataManager.floors);
+                    }
+
+                    // Call the search method with the collected jobs
+                    dataManager.findAndPrintUsersByFloor(floor1, floor2);
+                } else {
+                    System.out.println("Search cancelled.");
+                }
+
+            }
 
 
-        } while (num != 3); // loop until user enters 3 to close
+        } while (num != 5); // loop until user enters 3 to close
 
 
         reader.close();
 
     }
 
-    private static String getJobSelection(Scanner scanner)
+    private static String getSelection(Scanner scanner, ArrayList<String> list)
     {
-        ArrayList<String> availableJobs = DataManager.jobs;
         // Print the available jobs
-        for (int i = 0; i < availableJobs.size(); i++) {
-            String job = availableJobs.get(i);
+        for (int i = 0; i < list.size(); i++) {
+            String job = list.get(i);
             // Removed the check that prevents a user from seeing an already selected job.
             System.out.println((i + 1) + ". " + job);
         }
@@ -118,12 +164,12 @@ public class SearchList
             System.out.print("Enter the number for your job selection: ");
             try {
                 int selection = Integer.parseInt(scanner.nextLine());
-                if (selection > 0 && selection <= availableJobs.size()) {
-                    String selectedJob = availableJobs.get(selection - 1);
+                if (selection > 0 && selection <= list.size()) {
+                    String selectedJob = list.get(selection - 1);
                     // Removed the check that prevents a user from selecting an already selected job.
                     return selectedJob;
                 } else {
-                    System.out.println("Invalid selection. Please enter a number between 1 and " + availableJobs.size() + ".");
+                    System.out.println("Invalid selection. Please enter a number between 1 and " + list.size() + ".");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");

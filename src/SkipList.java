@@ -18,41 +18,51 @@ public class SkipList<T extends Comparable<T>> // crates and maintains a skip li
         return level;
     }
 
-    public void add(T newData) {
+    public void add(T newData)
+    {
         Node<T>[] update = new Node[MAX_LEVEL + 1];
         Node<T> current = head;
 
-        for (int i = level; i >= 0; i--) {
-            while (current.forward[i] != null && current.forward[i].data.compareTo(newData) < 0) {
+        for (int i = level; i >= 0; i--)
+        {
+            while (current.forward[i] != null && current.forward[i].data.compareTo(newData) < 0)
+            {
                 current = current.forward[i];
             }
             update[i] = current;
         }
 
         int newLevel = randomLevel();
-        if (newLevel > level) {
-            for (int i = level + 1; i <= newLevel; i++) {
+        if (newLevel > level)
+        {
+            for (int i = level + 1; i <= newLevel; i++)
+            {
                 update[i] = head;
             }
             level = newLevel;
         }
 
         Node<T> newNode = new Node<>(newData, newLevel);
-        for (int i = 0; i <= newLevel; i++) {
+        for (int i = 0; i <= newLevel; i++)
+        {
             newNode.forward[i] = update[i].forward[i];
             update[i].forward[i] = newNode;
         }
     }
 
-    public Node<T> logSearch(T searchData) {
+    public Node<T> logSearch(T searchData)
+    {
         Node<T> current = head;
-        for (int i = level; i >= 0; i--) {
-            while (current.forward[i] != null && current.forward[i].data.compareTo(searchData) < 0) {
+        for (int i = level; i >= 0; i--)
+        {
+            while (current.forward[i] != null && current.forward[i].data.compareTo(searchData) < 0)
+            {
                 current = current.forward[i];
             }
         }
         current = current.forward[0];
-        if (current != null && current.data.compareTo(searchData) == 0) {
+        if (current != null && current.data.compareTo(searchData) == 0)
+        {
             return current;
         }
 
