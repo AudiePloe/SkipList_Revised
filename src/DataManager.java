@@ -1,28 +1,63 @@
 import java.io.*;
 import java.util.ArrayList;
 
-public class DataManager {
+/**
+ * Manages the SkipLists of the program.
+ * As well as the arraylists of jobs, workdays, and floors.
+ */
+public class DataManager
+{
 
+    public static User rat;
 
     static SkipList ssnList = new SkipList(); // the skip list that holds all the nodes
     static SkipList jobList = new SkipList();
     static SkipList workdayList = new SkipList();
     static SkipList floorList = new SkipList();
+    static SkipList departmentList = new SkipList();
 
 
-    private static final int MAX_LEVEL = 32;
-    public static ArrayList<String> jobs = new ArrayList<>();
-    public static ArrayList<String> workdays = new ArrayList<>();
-    public static ArrayList<String> floors = new ArrayList<>();
+    private static ArrayList<String> jobs = new ArrayList<>();
+    private static ArrayList<String> workDays = new ArrayList<>();
+    private static ArrayList<String> floors = new ArrayList<>();
+    private static ArrayList<String> departments = new ArrayList<>();
 
     // A counter to keep track of the current item for balanced distribution
     private static int jobCounter = 0;
     private static int workdayCounter = 0;
     private static int floorCounter = 0;
+    private static int departmentCounter = 0;
+
+    private static ArrayList<ArrayList<User>> customLists = new ArrayList<ArrayList<User>>();
 
 
+    public static User getRat()
+    {
+        return rat;
+    }
 
-    public void createAllLists() throws IOException {
+    public static ArrayList<String> getJobs()
+    {
+        return jobs;
+    }
+
+    public static ArrayList<String> getWorkDays()
+    {
+        return workDays;
+    }
+
+    public static ArrayList<String> getFloors()
+    {
+        return floors;
+    }
+
+    public static ArrayList<String> getDepartments()
+    {
+        return departments;
+    }
+
+    public void createAllLists() throws IOException
+    {
         loadAllCategories();
 
         readFromFile(new File("Users.txt")); // creates the list
@@ -38,46 +73,61 @@ public class DataManager {
             {
                 list.add(line.trim());
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
 
     // Method to get the next item in a balanced, cycling order
-    public static String getNextJob() {
+    public static String getNextJob()
+    {
         return jobs.get(jobCounter++ % jobs.size());
     }
 
     public static String getRandJob()
     {
-        return jobs.get((int)(Math.random() * jobs.size()));
+        return jobs.get((int) (Math.random() * jobs.size()));
     }
 
-    public static String getNextWorkday() {
-        return workdays.get(workdayCounter++ % workdays.size());
+    public static String getNextWorkday()
+    {
+        return workDays.get(workdayCounter++ % workDays.size());
     }
+
     public static String getRandWorkDay()
     {
-        return workdays.get((int)(Math.random() * workdays.size()));
+        return workDays.get((int) (Math.random() * workDays.size()));
     }
 
-    public static String getNextFloor() {
+    public static String getNextFloor()
+    {
         return floors.get(floorCounter++ % floors.size());
     }
+
     public static String getRandFloor()
     {
-        return floors.get((int)(Math.random() * floors.size()));
+        return floors.get((int) (Math.random() * floors.size()));
+    }
+
+    public static String getNextDepartment()
+    {
+        return departments.get(departmentCounter++ % departments.size());
     }
 
     // Call this method before starting your main user-reading loop
-    public static void loadAllCategories() {
+    public static void loadAllCategories()
+    {
         readCategoriesFromFile("jobs.txt", jobs);
-        readCategoriesFromFile("workdays.txt", workdays);
+        readCategoriesFromFile("workdays.txt", workDays);
         readCategoriesFromFile("floors.txt", floors);
+        readCategoriesFromFile("departments.txt", departments);
 
-        jobCounter = (int)(Math.random() * 10);
-        workdayCounter = (int)(Math.random() * 10);
-        floorCounter = (int)(Math.random() * 10);
+        jobCounter = (int) (Math.random() * 10);
+        workdayCounter = (int) (Math.random() * 10);
+        floorCounter = (int) (Math.random() * 10);
+        departmentCounter = (int) (Math.random() * 10);
     }
 
 
@@ -107,7 +157,8 @@ public class DataManager {
                 ++count;
             }
             lines = count;
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             e.printStackTrace();
         }
@@ -116,7 +167,8 @@ public class DataManager {
     }
 
     @SuppressWarnings("unchecked")
-    public void readFromFile(File file) throws IOException {
+    public void readFromFile(File file) throws IOException
+    {
 
         RandomAccessFile database = new RandomAccessFile(file, "rw");
         String line = "";
@@ -124,50 +176,65 @@ public class DataManager {
 
         System.out.print("\n");
 
-        for (int i = 0; i < lineCount; i++) {
-            try {
+        int ratNum = (int)(Math.random() * lineCount);
+
+        for (int i = 0; i < lineCount; i++)
+        {
+            try
+            {
                 line = database.readLine();
                 User newUser = new User();
                 newUser = newUser.getUserFromTxt(line);
 
                 // Assign two jobs, two workdays, and two floors
                 // Use i * 2 to ensure a different item for the second assignment
-                newUser.job1 = getNextJob();
-                newUser.job2 = getRandJob();
+                newUser.setJob1(getNextJob());
+                newUser.setJob2(getRandJob());
 
-                newUser.workDay1 = getNextWorkday();
-                newUser.workDay2 = getRandWorkDay();
+                newUser.setWorkDay1(getNextWorkday());
+                newUser.setWorkDay2(getRandWorkDay());
 
-                newUser.floor1 = getNextFloor();
-                newUser.floor2 = getRandFloor();
+                newUser.setFloor1(getNextFloor());
+                newUser.setFloor2(getRandFloor());
+
+                newUser.setDepartment(getNextDepartment());
 
 
                 ssnList.add(new UserBySSN(newUser));
 
-                jobList.add(new UserJobWrapper(newUser.job1, newUser));
-                jobList.add(new UserJobWrapper(newUser.job2, newUser));
+                jobList.add(new UserJobWrapper(newUser.getJob1(), newUser));
+                jobList.add(new UserJobWrapper(newUser.getJob2(), newUser));
 
                 // Add both workdays to the workday list
-                workdayList.add(new UserWorkdayWrapper(newUser.workDay1, newUser));
-                workdayList.add(new UserWorkdayWrapper(newUser.workDay2, newUser));
+                workdayList.add(new UserWorkdayWrapper(newUser.getWorkDay1(), newUser));
+                workdayList.add(new UserWorkdayWrapper(newUser.getWorkDay2(), newUser));
 
                 // Add both floors to the floor list
-                floorList.add(new UserFloorWrapper(newUser.floor1, newUser));
-                floorList.add(new UserFloorWrapper(newUser.floor2, newUser));
+                floorList.add(new UserFloorWrapper(newUser.getFloor1(), newUser));
+                floorList.add(new UserFloorWrapper(newUser.getFloor2(), newUser));
 
+                departmentList.add(new UserDepartmentWrapper(newUser.getDepartment(), newUser));
+
+                if(i == ratNum)
+                {
+                    rat = newUser;
+                }
 
                 if (i % 10000 == 0) // for every 10000 users print a .
                     System.out.print(".");
 
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 e.printStackTrace();
             }
         }
         database.close();
     }
 
-    public void findAndPrintUsersByJobs(String job1, String job2)
+    public ArrayList<User> findAndPrintUsersByJobs(String job1, String job2)
     {
+        ArrayList<User> foundUsers = new ArrayList<>();
         // 1. Create a temporary wrapper object for the initial search.
         UserJobWrapper searchWrapper = new UserJobWrapper(job1, new User());
 
@@ -178,7 +245,7 @@ public class DataManager {
         if (foundNode == null)
         {
             System.out.println("No users found with the job: " + job1);
-            return;
+            return null;
         }
 
         System.out.println("Users with jobs '" + job1 + "'");
@@ -194,7 +261,6 @@ public class DataManager {
         // 4. Start a linear scan from the first found node.
         Node<UserJobWrapper> current = foundNode;
 
-        int foundUsers = 0;
         // 5. Iterate through the base level of the skip list.
         while (current != null && current.data.jobName.equalsIgnoreCase(job1))
         {
@@ -203,28 +269,34 @@ public class DataManager {
 
             // Check if the user has a job that matches the second input (if it's not null).
             // The check must be against both job1 and job2 on the user object because a user has both.
-            boolean matchesSecondJob = (job2 == null || (user.job1.equalsIgnoreCase(job1) && user.job2.equalsIgnoreCase(job2)) ||
-                    (user.job1.equalsIgnoreCase(job2) && user.job2.equalsIgnoreCase(job1)));
+            boolean matchesSecondJob = (job2 == null || (user.getJob1().equalsIgnoreCase(job1) && user.getJob2().equalsIgnoreCase(job2)) ||
+                    (user.getJob1().equalsIgnoreCase(job2) && user.getJob2().equalsIgnoreCase(job1)));
 
             // Print the user's data if they have both jobs (or just job1 if job2 is null).
             if (matchesSecondJob)
             {
-                System.out.println("SSN: " + user.SSN);
-                System.out.println("Name: " + user.FirstName + " " + user.LastName);
+                /*
+                System.out.println("SSN: " + user.getSSN());
+                System.out.println("Name: " + user.getFirstName() + " " + user.getLastName());
                 System.out.println("Job 1: " + user.job1 + " " + user.workDay1 + " " + user.floor1);
                 System.out.println("Job 2: " + user.job2 + " " + user.workDay2 + " " + user.floor2);
                 System.out.println("---------------------------------------------------------------");
-                foundUsers++;
+                 */
+
+                foundUsers.add(user);
+                System.out.println(user.toString());
             }
             // Move to the next node in the list.
             current = current.forward[0];
         }
-        System.out.println("\nNumber of matching users found: " + foundUsers);
+        //System.out.println("\nNumber of matching users found: " + foundUsers.size());
+        return foundUsers;
     }
 
 
-    public void findAndPrintUsersByWorkday(String workDay1, String workDay2)
+    public ArrayList<User> findAndPrintUsersByWorkday(String workDay1, String workDay2)
     {
+        ArrayList<User> foundUsers = new ArrayList<>();
         // 1. Create a temporary wrapper object for the initial search.
         UserWorkdayWrapper searchWrapper = new UserWorkdayWrapper(workDay1, new User());
 
@@ -235,7 +307,7 @@ public class DataManager {
         if (foundNode == null)
         {
             System.out.println("No users found with the Work days: " + workDay1);
-            return;
+            return null;
         }
 
         System.out.println("Users with Work days '" + workDay1 + "'");
@@ -251,7 +323,6 @@ public class DataManager {
         // 4. Start a linear scan from the first found node.
         Node<UserWorkdayWrapper> current = foundNode;
 
-        int foundUsers = 0;
         // 5. Iterate through the base level of the skip list.
         while (current != null && current.data.workDayName.equalsIgnoreCase(workDay1))
         {
@@ -260,27 +331,34 @@ public class DataManager {
 
             // Check if the user has a job that matches the second input (if it's not null).
             // The check must be against both job1 and job2 on the user object because a user has both.
-            boolean matchesSecondJob = (workDay2 == null || (user.workDay1.equalsIgnoreCase(workDay1) && user.workDay2.equalsIgnoreCase(workDay2)) ||
-                    (user.workDay1.equalsIgnoreCase(workDay2) && user.workDay2.equalsIgnoreCase(workDay1)));
+            boolean matchesSecondJob = (workDay2 == null || (user.getWorkDay1().equalsIgnoreCase(workDay1) && user.getWorkDay2().equalsIgnoreCase(workDay2)) ||
+                    (user.getWorkDay1().equalsIgnoreCase(workDay2) && user.getWorkDay2().equalsIgnoreCase(workDay1)));
 
             // Print the user's data if they have both jobs (or just job1 if job2 is null).
             if (matchesSecondJob)
             {
+                /*
                 System.out.println("SSN: " + user.SSN);
                 System.out.println("Name: " + user.FirstName + " " + user.LastName);
                 System.out.println("Job 1: " + user.job1 + " " + user.workDay1 + " " + user.floor1);
                 System.out.println("Job 2: " + user.job2 + " " + user.workDay2 + " " + user.floor2);
                 System.out.println("---------------------------------------------------------------");
-                foundUsers++;
+                 */
+
+                foundUsers.add(user);
+                System.out.println(user.toString());
             }
             // Move to the next node in the list.
             current = current.forward[0];
         }
-        System.out.println("\nNumber of matching users found: " + foundUsers);
+        //System.out.println("\nNumber of matching users found: " + foundUsers.size());
+        return foundUsers;
     }
 
-    public void findAndPrintUsersByFloor(String floor1, String floor2)
+    public ArrayList<User> findAndPrintUsersByFloor(String floor1, String floor2)
     {
+        ArrayList<User> foundUsers = new ArrayList<>();
+
         // 1. Create a temporary wrapper object for the initial search.
         UserFloorWrapper searchWrapper = new UserFloorWrapper(floor1, new User());
 
@@ -291,7 +369,7 @@ public class DataManager {
         if (foundNode == null)
         {
             System.out.println("No users found working on floor: " + floor1);
-            return;
+            return null;
         }
 
         System.out.println("Users working on floor '" + floor1 + "'");
@@ -307,7 +385,6 @@ public class DataManager {
         // 4. Start a linear scan from the first found node.
         Node<UserFloorWrapper> current = foundNode;
 
-        int foundUsers = 0;
         // 5. Iterate through the base level of the skip list.
         while (current != null && current.data.floorNumber.equalsIgnoreCase(floor1))
         {
@@ -316,22 +393,85 @@ public class DataManager {
 
             // Check if the user has a job that matches the second input (if it's not null).
             // The check must be against both job1 and job2 on the user object because a user has both.
-            boolean matchesSecondJob = (floor2 == null || (user.floor1.equalsIgnoreCase(floor1) && user.floor2.equalsIgnoreCase(floor2)) ||
-                    (user.floor1.equalsIgnoreCase(floor2) && user.floor2.equalsIgnoreCase(floor1)));
+            boolean matchesSecondJob = (floor2 == null || (user.getFloor1().equalsIgnoreCase(floor1) && user.getFloor2().equalsIgnoreCase(floor2)) ||
+                    (user.getFloor1().equalsIgnoreCase(floor2) && user.getFloor2().equalsIgnoreCase(floor1)));
 
             // Print the user's data if they have both jobs (or just job1 if job2 is null).
             if (matchesSecondJob)
             {
+                /*
                 System.out.println("SSN: " + user.SSN);
                 System.out.println("Name: " + user.FirstName + " " + user.LastName);
                 System.out.println("Job 1: " + user.job1 + " " + user.workDay1 + " " + user.floor1);
                 System.out.println("Job 2: " + user.job2 + " " + user.workDay2 + " " + user.floor2);
                 System.out.println("---------------------------------------------------------------");
-                foundUsers++;
+                 */
+
+                foundUsers.add(user);
+                System.out.println(user.toString());
             }
             // Move to the next node in the list.
             current = current.forward[0];
         }
-        System.out.println("\nNumber of matching users found: " + foundUsers);
+        //System.out.println("\nNumber of matching users found: " + foundUsers.size());
+        return foundUsers;
+    }
+    public ArrayList<User> findAndPrintUsersByDepartment(String department)
+    {
+        ArrayList<User> foundUsers = new ArrayList<>();
+
+        // 1. Create a temporary wrapper object for the initial search.
+        UserDepartmentWrapper searchWrapper = new UserDepartmentWrapper(department, new User());
+
+        // 2. Perform a log search to find the first occurrence of job1.
+        Node<UserDepartmentWrapper> foundNode = departmentList.logSearch(searchWrapper);
+
+        // 3. Handle the case where no users are found with the first job.
+        if (foundNode == null)
+        {
+            System.out.println("No users found working on department: " + department);
+            return null;
+        }
+
+        System.out.println("Users working on department '" + department + ": ");
+
+        // 4. Start a linear scan from the first found node.
+        Node<UserDepartmentWrapper> current = foundNode;
+
+        // 5. Iterate through the base level of the skip list.
+        while (current != null && current.data.department.equalsIgnoreCase(department))
+        {
+            // Access the original User object.
+            User user = current.data.user;
+
+            // Check if the user has a job that matches the second input (if it's not null).
+            // The check must be against both job1 and job2 on the user object because a user has both.
+            boolean matches = ((user.getDepartment().equalsIgnoreCase(department)));
+
+            // Print the user's data if they have both jobs (or just job1 if job2 is null).
+            if (matches)
+            {
+                foundUsers.add(user);
+                System.out.println(user.toString());
+            }
+            // Move to the next node in the list.
+            current = current.forward[0];
+        }
+        //System.out.println("\nNumber of matching users found: " + foundUsers.size());
+        return foundUsers;
+    }
+
+    public static ArrayList<ArrayList<User>> getCustomLists()
+    {
+        return customLists;
+    }
+
+    public static void addToCustomLists(ArrayList<User> list)
+    {
+        customLists.add(list);
+    }
+    public static void setCustomLists(ArrayList<ArrayList<User>> customLists)
+    {
+        customLists = customLists;
     }
 }

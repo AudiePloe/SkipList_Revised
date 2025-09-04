@@ -2,18 +2,20 @@
 
 public class User // stores the user data
 {
-    public String SSN;
-    public String LastName;
-    public String FirstName;
+    private String SSN;
+    private String LastName;
+    private String FirstName;
 
-    public String job1;
-    public String job2;
+    private String job1;
+    private String job2;
 
-    public String workDay1;
-    public String workDay2;
+    private String workDay1;
+    private String workDay2;
 
-    public String floor1;
-    public String floor2;
+    private String floor1;
+    private String floor2;
+
+    private String department;
 
     User()
     {
@@ -43,9 +45,92 @@ public class User // stores the user data
         userInfo += ("\nName: " + FirstName + " " + LastName);
         userInfo += ("\nJob 1: " + job1 + " " + workDay1 + " " + floor1);
         userInfo += ("\nJob 2: " + job2 + " " + workDay2 + " " + floor2);
+        userInfo += ("\nDepartment: " + department);
         userInfo += ("\n------------------------------------------------------");
 
         return userInfo;
+    }
+
+    public void setFloor2(String floor2)
+    {
+        this.floor2 = floor2;
+    }
+
+    public void setFloor1(String floor1)
+    {
+        this.floor1 = floor1;
+    }
+
+    public void setWorkDay2(String workDay2)
+    {
+        this.workDay2 = workDay2;
+    }
+
+    public void setWorkDay1(String workDay1)
+    {
+        this.workDay1 = workDay1;
+    }
+
+    public void setJob2(String job2)
+    {
+        this.job2 = job2;
+    }
+
+    public void setJob1(String job1)
+    {
+        this.job1 = job1;
+    }
+
+    public void setSSN(String SSN)
+    {
+        this.SSN = SSN;
+    }
+
+    public String getJob1()
+    {
+        return job1;
+    }
+    public String getJob2()
+    {
+        return job2;
+    }
+    public String getWorkDay1()
+    {
+        return workDay1;
+    }
+    public String getWorkDay2()
+    {
+        return workDay2;
+    }
+    public String getFloor1()
+    {
+        return floor1;
+    }
+    public String getFloor2()
+    {
+        return floor2;
+    }
+    public String getSSN()
+    {
+        return SSN;
+    }
+    public String getFirstName()
+    {
+        return FirstName;
+    }
+    public String getLastName()
+    {
+        return LastName;
+    }
+
+    public String getDepartment()
+    {
+        return department;
+    }
+
+    public void setDepartment(String department)
+    {
+        this.department = department;
     }
 }
 
@@ -62,7 +147,7 @@ class UserBySSN implements Comparable<UserBySSN>
     @Override
     public int compareTo(UserBySSN other)
     {
-        return this.user.SSN.compareTo(other.user.SSN);
+        return this.user.getSSN().compareTo(other.user.getSSN());
     }
 }
 
@@ -120,5 +205,23 @@ class UserFloorWrapper implements Comparable<UserFloorWrapper>
     {
         // Compares by the floor number
         return this.floorNumber.compareTo(other.floorNumber);
+    }
+}
+class UserDepartmentWrapper implements Comparable<UserDepartmentWrapper>
+{
+    public String department;
+    public User user; // Reference to the original User object
+
+    public UserDepartmentWrapper(String department, User user)
+    {
+        this.department = department;
+        this.user = user;
+    }
+
+    @Override
+    public int compareTo(UserDepartmentWrapper other)
+    {
+        // Compares by the floor number
+        return this.department.compareTo(other.department);
     }
 }
