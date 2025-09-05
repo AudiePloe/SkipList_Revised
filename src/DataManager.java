@@ -1,5 +1,8 @@
 import java.io.*;
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.random.RandomGenerator;
 
 /**
  * Manages the SkipLists of the program.
@@ -8,7 +11,14 @@ import java.util.ArrayList;
 public class DataManager
 {
 
-    public static User rat;
+    private static Random randomNum = new Random(System.currentTimeMillis());
+
+    private static User rat;
+    private static String ratJob;
+    private static String ratWorkDay;
+    private static String ratFloor;
+    private static String ratDepartment;
+
 
     static SkipList ssnList = new SkipList(); // the skip list that holds all the nodes
     static SkipList jobList = new SkipList();
@@ -34,6 +44,16 @@ public class DataManager
     public static User getRat()
     {
         return rat;
+    }
+
+    public static String printRat()
+    {
+        String ratString = "THE RAT...";
+        ratString += ("\nJob1: " + rat.getJob1() + " " + rat.getWorkDay1() + " " + rat.getFloor1());
+        ratString += ("\nJob2: " + rat.getJob2() + " " + rat.getWorkDay2() + " " + rat.getFloor2());
+        ratString += ("\nJob3: " + ratJob + " " + ratWorkDay + " " + ratFloor);
+        ratString += ("\nDepartment1: " + rat.getDepartment() + "\nDepartment2: " + ratDepartment);
+        return (ratString);
     }
 
     public static ArrayList<String> getJobs()
@@ -88,7 +108,7 @@ public class DataManager
 
     public static String getRandJob()
     {
-        return jobs.get((int) (Math.random() * jobs.size()));
+        return jobs.get((int) (randomNum.nextFloat() * jobs.size()));
     }
 
     public static String getNextWorkday()
@@ -114,6 +134,10 @@ public class DataManager
     public static String getNextDepartment()
     {
         return departments.get(departmentCounter++ % departments.size());
+    }
+    public static String getRandDepartment()
+    {
+        return departments.get((int)(Math.random() * departments.size()));
     }
 
     // Call this method before starting your main user-reading loop
@@ -188,16 +212,16 @@ public class DataManager
 
                 // Assign two jobs, two workdays, and two floors
                 // Use i * 2 to ensure a different item for the second assignment
-                newUser.setJob1(getNextJob());
+                newUser.setJob1(getRandJob());
                 newUser.setJob2(getRandJob());
 
-                newUser.setWorkDay1(getNextWorkday());
+                newUser.setWorkDay1(getRandWorkDay());
                 newUser.setWorkDay2(getRandWorkDay());
 
-                newUser.setFloor1(getNextFloor());
+                newUser.setFloor1(getRandFloor());
                 newUser.setFloor2(getRandFloor());
 
-                newUser.setDepartment(getNextDepartment());
+                newUser.setDepartment(getRandDepartment());
 
 
                 ssnList.add(new UserBySSN(newUser));
@@ -218,6 +242,10 @@ public class DataManager
                 if(i == ratNum)
                 {
                     rat = newUser;
+                    ratJob = getRandJob();
+                    ratWorkDay = getRandWorkDay();
+                    ratFloor = getRandFloor();
+                    ratDepartment = getRandDepartment();
                 }
 
                 if (i % 10000 == 0) // for every 10000 users print a .

@@ -33,26 +33,34 @@ public class SearchList
     {
         Scanner reader = new Scanner(System.in);
 
-        int num = 0; // used as storage for user input
+        int input = 0; // used as storage for user input
 
         do // loops asking the user what they want to do
         {
+            System.out.println(DataManager.printRat());
+            System.out.println("__________________________\n");
+
             System.out.println("\nWelcome to the user database.");
-            System.out.println("1) Look up a user");
+            System.out.println("1) Guess the rat");
             System.out.println("2) List all users by job");
             System.out.println("3) List all users by workDays");
             System.out.println("4) List all users by floor");
             System.out.println("5) List all users by department");
             System.out.println("6) To exit");
 
-            num = reader.nextInt();
+            if (reader.hasNextInt())
+            {
+                input = reader.nextInt();
+            }
             reader.nextLine();
 
-            if(num == 1)
+
+            if (input == 1)
             {
-                mainSearchRoutine(reader, num);
+                if(mainSearchRoutine(reader, input))
+                    break;
             }
-            else if (num != 6 && !DataManager.getCustomLists().isEmpty())
+            else if (input != 6 && !DataManager.getCustomLists().isEmpty())
             {
                 int listNum;
                 System.out.println("Would you like to search inside:");
@@ -60,25 +68,35 @@ public class SearchList
 
                 for (int i = 0; i < DataManager.getCustomLists().size(); i++)
                 {
-                    System.out.printf("%d) Custom %d\n", (i + 2), DataManager.getCustomLists().size());
+                    System.out.printf("%d) Custom %d\n", (i + 2), i + 1);
                 }
-                listNum = reader.nextInt();
-                reader.nextLine();
+                try
+                {
+                    listNum = Integer.parseInt(reader.nextLine());
+                }
+                catch (NumberFormatException e)
+                {
+                    throw new RuntimeException(e);
+                }
 
                 if (listNum == 1)
                 {
-                    mainSearchRoutine(reader, num);
+                    mainSearchRoutine(reader, input);
                 }
                 else if (listNum >= 2 || listNum <= DataManager.getCustomLists().size() + 1)
                 {
-                    customSearchRoutine(reader, num, listNum - 2);
+                    customSearchRoutine(reader, input, listNum - 2);
+                }
+                else
+                {
+                    System.out.println("Invalid selection...");
                 }
             }
             else
             {
-                mainSearchRoutine(reader, num);
+                mainSearchRoutine(reader, input);
             }
-        } while (num != 6); // loop until user enters 3 to close
+        } while (input != 6); // loop until user enters 3 to close
 
         reader.close();
     }
@@ -285,7 +303,7 @@ public class SearchList
         }
     }
 
-    private static void mainSearchRoutine(Scanner reader, int num)
+    private static boolean mainSearchRoutine(Scanner reader, int num)
     {
         String tmpString;
         if (num == 1) // If looking up user
@@ -309,7 +327,17 @@ public class SearchList
                 User foundUser = foundNode.data.user;
                 String userData = foundUser.toString();
 
-                System.out.println(userData);
+                if(DataManager.getRat() == foundUser)
+                {
+                    System.out.println("\nCONGRATULATIONS YOU FOUND THE RAT!!");
+                    System.out.println(userData);
+                    return true;
+                }
+                else
+                {
+                    System.out.println("\nThis user is not the rat...");
+                    System.out.println(userData);
+                }
             }
             else
             {
@@ -406,64 +434,65 @@ public class SearchList
                 System.out.println("Search cancelled.");
             }
         }
+        return false;
     }
 
-        private static void promptAddCustomList (Scanner reader, ArrayList < User > list)
+    private static void promptAddCustomList(Scanner reader, ArrayList<User> list)
+    {
+        String tmpString;
+        System.out.println("Number of matching users found: " + list.size());
+        System.out.println("Would you like to save this list? (y/n)");
+        tmpString = reader.nextLine();
+        if (tmpString.equals("y"))
         {
-            String tmpString;
-            System.out.println("Number of matching users found: " + list.size());
-            System.out.println("Would you like to save this list? (y/n)");
-            tmpString = reader.nextLine();
-            if (tmpString.equals("y"))
-            {
-                DataManager.addToCustomLists(list);
-            }
+            DataManager.addToCustomLists(list);
+        }
+    }
+
+    private static String getSelection(Scanner scanner, ArrayList<String> list)
+    {
+        // Print the available jobs
+        for (int i = 0; i < list.size(); i++)
+        {
+            String job = list.get(i);
+            // Removed the check that prevents a user from seeing an already selected job.
+            System.out.println((i + 1) + ". " + job);
         }
 
-        private static String getSelection (Scanner scanner, ArrayList < String > list)
+        while (true)
         {
-            // Print the available jobs
-            for (int i = 0; i < list.size(); i++)
-            {
-                String job = list.get(i);
-                // Removed the check that prevents a user from seeing an already selected job.
-                System.out.println((i + 1) + ". " + job);
-            }
-
-            while (true)
-            {
-                System.out.print("Enter the number for your selection: ");
-                try
-                {
-                    int selection = Integer.parseInt(scanner.nextLine());
-                    if (selection > 0 && selection <= list.size())
-                    {
-                        // Removed the check that prevents a user from selecting an already selected job.
-                        return list.get(selection - 1);
-                    }
-                    else
-                    {
-                        System.out.println("Invalid selection. Please enter a number between 1 and " + list.size() + ".");
-                    }
-                }
-                catch (NumberFormatException e)
-                {
-                    System.out.println("Invalid input. Please enter a number.");
-                }
-            }
-        }
-
-        public static boolean isNumeric (String str) // checks to see if ssn is a number or not
-        {
+            System.out.print("Enter the number for your selection: ");
             try
             {
-                Double.parseDouble(str); // if it can parse to a double then true
-                return true;
+                int selection = Integer.parseInt(scanner.nextLine());
+                if (selection > 0 && selection <= list.size())
+                {
+                    // Removed the check that prevents a user from selecting an already selected job.
+                    return list.get(selection - 1);
+                }
+                else
+                {
+                    System.out.println("Invalid selection. Please enter a number between 1 and " + list.size() + ".");
+                }
             }
             catch (NumberFormatException e)
             {
-                return false;
+                System.out.println("Invalid input. Please enter a number.");
             }
-
         }
     }
+
+    public static boolean isNumeric(String str) // checks to see if ssn is a number or not
+    {
+        try
+        {
+            Double.parseDouble(str); // if it can parse to a double then true
+            return true;
+        }
+        catch (NumberFormatException e)
+        {
+            return false;
+        }
+
+    }
+}
